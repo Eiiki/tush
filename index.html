@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tush - Programming language</title>
+        <meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="libs/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="libs/font-awesome.css">
+        <link rel="stylesheet" type="text/css" href="app.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-static-top">
+            <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Brand</a>
+                </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">Link</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Link</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+<div class="container">
+<div class="scrollmargin"></div>
+<pre id="editor">
+
+def func()
+    var x;
+    var y;
+    x = 0;
+    y = 1;
+
+    if (x)
+        x = 0;
+    elsif (y)
+        x = y;
+    else
+        x = 1;
+    endif;
+
+    y = 10;
+    while(y)
+        y = y - 1;
+        x = x + 1;
+    endwhile;
+
+    return x;
+end
+
+def sum(a, b)
+    return a + b;
+end
+</pre>
+<button type="button" id="lexCode" class="btn btn-primary">Lex to console</button>
+</div>
+        <script src="libs/jquery.js"></script>
+        <script src="libs/bootstrap.js"></script>
+        <script src="libs/ace/src-min-noconflict/ace.js"></script>
+        <script src="tush.js"></script>
+        <script src="tushGenerator.js"></script>
+    </body>
+</html>
