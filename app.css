@@ -2,10 +2,38 @@
     position: relative !important;
     border: 1px solid lightgray;
     margin: 0;/*auto;*/
-    height: 200px;
-    width: 50%;
+    height: 510px;
+    width: 100%;
 }
 .scrollmargin {
     height: 10px;
     text-align: center;
+}
+.lex-content{
+	position: relative;
+}
+.table-scroll tr{
+	width:100%;
+	display: inline-table;
+	text-align: left;
+}
+.table-scroll table{
+	position: relative;
+	width: 100%;
+	height:480px;
+}
+.table-scroll thead{
+	position: absolute;
+	width:100%;
+}
+.table-scroll tbody{
+	margin-top: 38px;
+	overflow-y: scroll;
+	height:480px;
+	width:100%;
+	position: absolute;
+}
+.table-scroll td,
+.table-scroll th{
+	width:33%;
 }

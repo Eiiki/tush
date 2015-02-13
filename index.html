@@ -57,9 +57,9 @@
             </div><!-- /.container-fluid -->
         </nav>
 <div class="container">
-<div class="scrollmargin"></div>
+    <div class="col-md-7 col-lg-7">
+        <div class="scrollmargin"></div>
 <pre id="editor">
-
 def func()
     var x;
     var y;
@@ -72,13 +72,13 @@ def func()
         x = y;
     else
         x = 1;
-    endif;
+    end;
 
     y = 10;
     while(y)
         y = y - 1;
         x = x + 1;
-    endwhile;
+    end;
 
     return x;
 end
@@ -87,8 +87,12 @@ def sum(a, b)
     return a + b;
 end
 </pre>
-<button type="button" id="lexCode" class="btn btn-primary">Lex to console</button>
+        <button type="button" id="lexCode" class="btn btn-primary">Lex</button>
+    </div>
+    <div class="col-md-5 col-lg-5 lex-content parse-content">
+    </div>
 </div>
+
         <script src="libs/jquery.js"></script>
         <script src="libs/bootstrap.js"></script>
         <script src="libs/ace/src-min-noconflict/ace.js"></script>

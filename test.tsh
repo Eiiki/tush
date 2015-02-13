@@ -10,13 +10,13 @@ def func()
 		x = y;
 	else
 		x = 1;
-	endif;
+	end;
 
 	y = 10;
 	while(y)
 		y = y - 1;
 		x = x + 1;
-	endwhile;
+	end;
 
 	return x;
 end

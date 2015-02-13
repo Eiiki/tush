@@ -6,28 +6,30 @@
 %%
 
 \s+                        /* skip whitespace */
-"def"                      return 'FUNCDECL'
-"end"                      return 'FUNCEND'
-"while"                    return 'WHILE'
-"endwhile"                 return 'ENDWHILE'
-"if"                       return 'IF'
-"elsif"                    return 'ELSIF'
-"else"                     return 'ELSE'
-"endif"                    return 'ENDIF'
-"var"                      return 'VARDECL'
-"return"                   return 'RETURN'
+"not"                      return 'NOT';
+"!"                        return 'NOT';
+"or"                       return 'OR';
+"||"                       return 'OR';
+"and"                      return 'AND';
+"&&"                       return 'AND';
+"var"                      return 'VARDECL';
+"def"                      return 'FUNDECL';
+"while"                    return 'WHILE';
+"if"                       return 'IF';
+"elsif"                    return 'ELSIF';
+"else"                     return 'ELSE';
+"end"                      return 'END';
+";"                        return 'DECLEND';
+"return"                   return 'RETURN';
 "*"                        return '*';
 "/"                        return '/';
 "-"                        return '-';
 "+"                        return '+';
-//"^"                      return '^';
-//"!"                      return '!';
 "%"                        return '%';
-"="                        return '='
+"="                        return '=';
 "("                        return '(';
 ")"                        return ')';
 ","                        return ',';
-";"                        return 'DECLEND'
 [0-9]+("."[0-9]+)?\b       return 'NUMBER';
 [A-Za-z]+([0-9A-Za-z])*\b  return 'NAME';
 <<EOF>>                    return 'EOF';
@@ -35,23 +37,23 @@
 
 /lex
 
-%token FUNCDECL
-%token FUNCEND
+%token FUNDECL
 %token VARDECL
 %token WHILE
-%token ENDWHILE
 %token IF
 %token ELSIF
 %token ELSE
-%token ENDIF
 %token RETURN
+%token END
+%token EOF
 /* operator associations and precedence */
 
 %right RETURN
+%left NOT
+%left OR
+%left AND
 %left '+' '-'
 %left '*' '/'
-//%left '^'
-//%right '!'
 %right '='
 %right '%'
 %left UMINUS
@@ -67,131 +69,111 @@ program
    ;
 
 functions
-   : functions func 
-   | func
+   : functions fundecl 
+   | fundecl
    ;
 
-func
-   : FUNCDECL NAME '('')' funcbody FUNCEND               {  console.log("FUNCDECL: "+$1);
-                                                            console.log("FUNCNAME: "+$2);
-                                                            console.log("'(': "+$3);
-                                                            console.log("')': "+$4);
-                                                            console.log("FUNCEND: "+$6); 
-                                                         }
-   | FUNCDECL NAME '('multinames')' funcbody FUNCEND    {  console.log("FUNCDECL: "+$1);
-                                                            console.log("FUNCNAME: "+$2);
+fundecl
+   : FUNDECL NAME '(' optnames ')' optdecls exprs END   {  console.log("FUNDECL: "+$1);
+                                                            console.log("NAME: "+$2);
                                                             console.log("'(': "+$3);
                                                             console.log("')': "+$5);
-                                                            console.log("FUNCEND: "+$7); 
                                                          }
-
    ;
 
-funcbody
-   : decls exprs
-   | exprs
+optdecls
+   :        {  /* Optional declerations are optional */   }
+   | decls 
    ;
 
 decls
-   : decls decl DECLEND                      {  console.log("DECLEND: "+$3);  }
-   | decl DECLEND                            {  console.log("DECLEND: "+$2);  }
+   : decls decl DECLEND
+   | decl DECLEND
    ;
 
 decl
-   : VARDECL multinames                      {  console.log("VARDECL: "+$1);  }
+   : VARDECL names
+   ;
+
+optnames
+   :        {  /* Optional names are optional */   }
+   | names
+   ;
+
+names
+   : names ',' NAME     {  console.log("',': "+$2);
+                           console.log("NAME: "+$3);
+                        }
+   | NAME               {  console.log("NAME: "+$1);           }
    ;
 
 exprs
-   : exprs expr DECLEND                      {  console.log("DECLEND: "+$3);  }
-   | expr DECLEND                            {  console.log("DECLEND: "+$2);  }
+   : exprs expr DECLEND    {  console.log("DECLEND: "+$3);  }
+   | expr DECLEND          {  console.log("DECLEND: "+$2);  }
+   ;
+
+optexprs
+   :  {  /* Optional expressions are optional */ }
+   | exprsnodeclend
+   ;
+
+exprsnodeclend
+   : exprsnodeclend ',' expr 
+   |expr 
    ;
 
 expr
-   : expr '+' expr                           {  console.log("'+': "+$2);      }
-   | expr '-' expr                           {  console.log("'-': "+$2);      }
-   | expr '*' expr                           {  console.log("'*': "+$2);      }
-   | expr '/' expr                           {  console.log("'/': "+$2);      }
-   | expr '%' expr                           {  console.log("'%': "+$2);      }
-   | NUMBER                                  {  console.log("NUMBER: "+$1);   }
-   | NAME                                    {  console.log("NAME: "+$1);     }
-   | RETURN expr                             {  console.log("RETURN: "+$1);   }
-   | NAME '=' expr                           {  console.log("NAME: "+$1);
-                                                console.log("'=': "+$2);      }
-   | NAME '('')'                             {  console.log("NAME: "+$1);
-                                                console.log("'(': "+$2);
-                                                console.log("')': "+$3);      }
-   |  NAME '(' multiargs ')'                 {  console.log("NAME: "+$1);
-                                                console.log("'(': "+$2);
-                                                console.log("')': "+$4);      }
-   | '(' expr ')'                            {  console.log("'(': "+$1);
-                                                console.log("')': "+$3);      }
+   : NUMBER
+   | NAME
+   | NAME '=' expr
+   | NAME '(' optexprs ')'
+   | RETURN expr
+   //| OPNAME expr
+   //| expr 'OPNAME' expr
+   | expr '+' expr
+   | expr '-' expr
+   | expr '*' expr
+   | expr '/' expr
+   //| LITERAL
+   | '(' expr ')'
    | ifexpr
-   | WHILE '(' expr ')' body ENDWHILE        {  console.log("'(': "+$2);
-                                                console.log("')': "+$4);
-                                                console.log("ENDWHILE: "+$6); }
+   | WHILE '(' expr ')' body END {  console.log("WHILE: "+$1);
+                                    console.log("'(': "+$2);
+                                    console.log("')': "+$4);
+                                    console.log("END: "+$6);
+                                 }
    ;
 
 ifexpr
-   : IF '(' expr ')' body ENDIF                                         {  console.log("IF: "+$1);
-                                                                           console.log("'(': "+$2);
-                                                                           console.log("')': "+$4);
-                                                                           console.log("ENDIF: "+$6);
-                                                                        }
-   | IF '(' expr ')' body ELSE body ENDIF                               {  console.log("IF: "+$1);
-                                                                           console.log("'(': "+$2);
-                                                                           console.log("')': "+$4);
-                                                                           console.log("ELSE: "+$6);
-                                                                           console.log("ENDIF: "+$8);
-                                                                        }
-   | IF '(' expr ')' body ELSIF '(' expr ')' body ENDIF                 {  console.log("IF: "+$1);
-                                                                           console.log("'(': "+$2);
-                                                                           console.log("')': "+$4);
-                                                                           console.log("ELSIF: "+$6);
-                                                                           console.log("'(': "+$7);
-                                                                           console.log("')': "+$9);
-                                                                           console.log("ENDIF: "+$11);
-                                                                        }
-   | IF '(' expr ')' body ELSIF '(' expr ')' body ELSE body ENDIF       {  console.log("IF: "+$1);
-                                                                           console.log("'(': "+$2);
-                                                                           console.log("')': "+$4);
-                                                                           console.log("ELSIF: "+$6);
-                                                                           console.log("'(': "+$7);
-                                                                           console.log("')': "+$9);
-                                                                           console.log("ELSE: "+$11);
-                                                                           console.log("ENDIF: "+$13);
-                                                                        }
+   : IF '(' expr ')' body optelsifs optelse END  {  console.log("'(': "+$2);
+                                                   console.log("')': "+$4);
+                                                   console.log("END: "+$8);
+                                                }
+   ;
+
+optelsifs
+   :        {  /* optional elsif's is optional */ }
+   | elsifs
+   ;
+
+elsifs
+   : elsifs elsif
+   | elsif
+   ;
+
+elsif
+   : ELSIF '(' expr ')' body  {  console.log("ELSIF: "+$1);
+                                 console.log("'(': "+$2);
+                                 console.log("')': "+$4);
+                              }
+   ;
+
+optelse
+   :              {  /* optional else is optional */}
+   | ELSE body    {  console.log("ELSE: "+$1);   }
    ;
 
 body
-   : body expr DECLEND                       {  console.log("DECLEND: "+$3);  }
-   | expr DECLEND                            {  console.log("DECLEND: "+$2);  }
+   : exprs
    ;
-
-multinames
-   : multinames ',' NAME                     {  console.log("',' : "+$2);
-                                                console.log("NAME: "+$3);     }
-   | NAME                                    {  console.log("NAME: "+$1);     }
-   ;
-
-multiargs
-   : multiargs ',' expr                      {  console.log("',': "+$2);      }
-   | exprs
-   ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
