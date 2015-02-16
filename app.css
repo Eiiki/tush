@@ -1,8 +1,14 @@
+html,body{
+	height:100%;
+}
+.container.body{
+	position: relative;
+}
 .ace_editor {
     position: relative !important;
     border: 1px solid lightgray;
-    margin: 0;/*auto;*/
-    height: 510px;
+    margin: 0;
+    height: 100%;
     width: 100%;
 }
 .scrollmargin {
@@ -17,19 +23,20 @@
 	display: inline-table;
 	text-align: left;
 }
-.table-scroll table{
+table.table-scroll{
+	top:0;
 	position: relative;
 	width: 100%;
-	height:480px;
+	margin:0;
 }
 .table-scroll thead{
 	position: absolute;
 	width:100%;
 }
 .table-scroll tbody{
-	margin-top: 38px;
+	margin-top: 37px;
 	overflow-y: scroll;
-	height:480px;
+	height:calc(100% - 37px);
 	width:100%;
 	position: absolute;
 }

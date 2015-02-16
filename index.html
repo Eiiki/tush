@@ -56,8 +56,9 @@
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
         </nav>
-<div class="container">
-    <div class="col-md-7 col-lg-7">
+<div class="container body">
+    <div class="row" style="position:relative">
+    <div class="col-md-7 col-lg-7 editor-content">
         <div class="scrollmargin"></div>
 <pre id="editor">
 def func()
@@ -87,9 +88,14 @@ def sum(a, b)
     return a + b;
 end
 </pre>
-        <button type="button" id="lexCode" class="btn btn-primary">Lex</button>
+        </div>
+        <div class="col-md-5 col-lg-5 lex-content parse-content"></div>
     </div>
-    <div class="col-md-5 col-lg-5 lex-content parse-content">
+    <div class="col-md-12 col-lg-12" style="margin-top:20px">
+        <div class="btn-group pull-right" role="group">
+            <button type="button" id="lexCode" class="btn btn-default">Lex</button>
+            <button type="button" id="parseCode" class="btn btn-primary">Parse</button>
+        </div>
     </div>
 </div>
 
