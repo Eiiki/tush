@@ -1,6 +1,4 @@
 
-/* description: Parses and executes mathematical expressions. */
-
 /* lexical grammar */
 %lex
 %%
@@ -74,15 +72,12 @@ functions
    ;
 
 fundecl
-   : FUNDECL NAME '(' optnames ')' optdecls exprs END   {  console.log("FUNDECL: "+$1);
-                                                            console.log("NAME: "+$2);
-                                                            console.log("'(': "+$3);
-                                                            console.log("')': "+$5);
+   : FUNDECL NAME '(' optnames ')' optdecls exprs END    {  
                                                          }
    ;
 
 optdecls
-   :        {  /* Optional declerations are optional */   }
+   :  {  /* Optional declerations are optional */   }
    | decls 
    ;
 
@@ -96,20 +91,22 @@ decl
    ;
 
 optnames
-   :        {  /* Optional names are optional */   }
+   :  {  /* Optional names are optional */   }
    | names
    ;
 
 names
-   : names ',' NAME     {  console.log("',': "+$2);
-                           console.log("NAME: "+$3);
+   : names ',' NAME     {
                         }
-   | NAME               {  console.log("NAME: "+$1);           }
+   | NAME               {
+                        }
    ;
 
 exprs
-   : exprs expr DECLEND    {  console.log("DECLEND: "+$3);  }
-   | expr DECLEND          {  console.log("DECLEND: "+$2);  }
+   : exprs expr DECLEND    {  
+                           }
+   | expr DECLEND          { 
+                           }
    ;
 
 optexprs
@@ -137,22 +134,17 @@ expr
    //| LITERAL
    | '(' expr ')'
    | ifexpr
-   | WHILE '(' expr ')' body END {  console.log("WHILE: "+$1);
-                                    console.log("'(': "+$2);
-                                    console.log("')': "+$4);
-                                    console.log("END: "+$6);
+   | WHILE '(' expr ')' body END {
                                  }
    ;
 
 ifexpr
-   : IF '(' expr ')' body optelsifs optelse END  {  console.log("'(': "+$2);
-                                                   console.log("')': "+$4);
-                                                   console.log("END: "+$8);
+   : IF '(' expr ')' body optelsifs optelse END {
                                                 }
    ;
 
 optelsifs
-   :        {  /* optional elsif's is optional */ }
+   :  {  /* optional elsif's is optional */ }
    | elsifs
    ;
 
@@ -162,15 +154,14 @@ elsifs
    ;
 
 elsif
-   : ELSIF '(' expr ')' body  {  console.log("ELSIF: "+$1);
-                                 console.log("'(': "+$2);
-                                 console.log("')': "+$4);
+   : ELSIF '(' expr ')' body  {
                               }
    ;
 
 optelse
-   :              {  /* optional else is optional */}
-   | ELSE body    {  console.log("ELSE: "+$1);   }
+   :  {  /* optional else is optional */}
+   | ELSE body    { 
+                  }
    ;
 
 body

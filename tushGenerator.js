@@ -2,15 +2,14 @@ var tush = parser;
 tush.lexer = parser.lexer;
 
 var editor;
-var initEditor = function(maxLines){
-	if(!maxLines) maxLines = 32;
+var initEditor = function(){
 	editor = ace.edit("editor");
 	editor.setTheme("ace/theme/monokai");
 	editor.getSession().setMode("ace/mode/ruby");
 	editor.setAutoScrollEditorIntoView(true);
 	editor.setAutoScrollEditorIntoView(true);
-	editor.setOption("minLines", 35);
-    editor.setOption("maxLines", 35);
+	editor.setOption("minLines", 32);
+    editor.setOption("maxLines", 32);
     editor.setFontSize(13);
 };
 
@@ -18,6 +17,20 @@ var resizeContent = function(){
 	var desiredHeight = $(".editor-content").height();
 	$(".lex-content").height(desiredHeight);
 	$(".lex-content table.table-scroll").height(desiredHeight);
+};
+
+var renderSuccessMessages = function(){
+	var alertBox = $('<div class="alert alert-success alert-dismissible" role="alert">');
+		alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+		alertBox.append("<strong>Þáttaðist!</strong>");
+	$(".parse-content").html(alertBox);
+};
+
+var renderErrorMessages = function(err){
+	var alertBox = $('<div class="alert alert-danger alert-dismissible" role="alert">');
+		alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+		alertBox.append("<strong>"+err+"</strong>");
+	$(".parse-content").html(alertBox);
 };
 
 var lex = function(){
@@ -43,7 +56,16 @@ var lex = function(){
 };
 
 var parse = function(){
-	//tush.parser.parse(editor.getValue());
+	var hasNoError = true;
+	try{
+		tush.parse(editor.getValue());
+	}catch(err){
+		hasNoError = false;
+		renderErrorMessages(err);
+	}finally{
+		if(hasNoError)
+			renderSuccessMessages();
+	}
 };
 
 $(document).ready(function(){

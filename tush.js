@@ -88,10 +88,7 @@ case 1:
          return $$[$0-1]; 
 break;
 case 4:
-  console.log("FUNDECL: "+$$[$0-7]);
-                                                            console.log("NAME: "+$$[$0-6]);
-                                                            console.log("'(': "+$$[$0-5]);
-                                                            console.log("')': "+$$[$0-3]);
+  
                                                          
 break;
 case 5:
@@ -100,47 +97,42 @@ break;
 case 10:
   /* Optional names are optional */   
 break;
-case 12:
-  console.log("',': "+$$[$0-1]);
-                           console.log("NAME: "+$$[$0]);
+case 12: case 13:
+
                         
 break;
-case 13:
-  console.log("NAME: "+$$[$0]);           
+case 14:
+  
+                           
 break;
-case 14: case 15:
-  console.log("DECLEND: "+$$[$0]);  
+case 15:
+ 
+                           
 break;
 case 16:
   /* Optional expressions are optional */ 
 break;
 case 31:
-  console.log("WHILE: "+$$[$0-5]);
-                                    console.log("'(': "+$$[$0-4]);
-                                    console.log("')': "+$$[$0-2]);
-                                    console.log("END: "+$$[$0]);
+
                                  
 break;
 case 32:
-  console.log("'(': "+$$[$0-6]);
-                                                   console.log("')': "+$$[$0-4]);
-                                                   console.log("END: "+$$[$0]);
+
                                                 
 break;
 case 33:
   /* optional elsif's is optional */ 
 break;
 case 37:
-  console.log("ELSIF: "+$$[$0-4]);
-                                 console.log("'(': "+$$[$0-3]);
-                                 console.log("')': "+$$[$0-1]);
+
                               
 break;
 case 38:
   /* optional else is optional */
 break;
 case 39:
-  console.log("ELSE: "+$$[$0-1]);   
+ 
+                  
 break;
 }
 },
