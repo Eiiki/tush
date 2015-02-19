@@ -38,8 +38,9 @@ var renderErrorMessages = function(message, err){
 	var errMessages = $("<div class='error-messages'></div>");
 	err = err.split("\n")[0];
 	//for(var n = 0; n < err.length; n++){
-		errMessages.append("<p>"+err.toString()+"</p>");
+	//	errMessages.append("<p>"+err[n].toString()+"</p>");
 	//}
+	errMessages.append("<p>"+err.toString()+"</p>");
 	alertBox.append(errMessages);
 	$(".parse-content").html(alertBox);
 };

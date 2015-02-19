@@ -3,6 +3,7 @@ def func()
     var y;
     x = 10;
     y = 5;
+    #this is a comment
 
     if (x > 5)
         x = 5;
