@@ -7,6 +7,12 @@ nav{
 .body{
 	margin-top:10px;
 }
+.error-messages{
+	font-family: "Courier New", Courier, monospace;
+}
+.error-messages p{
+	margin:0;
+}
 .container.body{
 	position: relative;
 }

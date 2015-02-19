@@ -4,13 +4,14 @@
 %%
 
 \s+                        /* skip whitespace */
+^\#.*                      /* skip comments */ 
 "not"                      return 'NOT';
 "!"                        return 'NOT';
 "or"                       return 'OR';
 "||"                       return 'OR';
 "and"                      return 'AND';
 "&&"                       return 'AND';
-"var"                      return 'VARDECL';
+"var"                      return 'VAR';
 "def"                      return 'FUNDECL';
 "while"                    return 'WHILE';
 "if"                       return 'IF';
@@ -19,6 +20,11 @@
 "end"                      return 'END';
 ";"                        return 'DECLEND';
 "return"                   return 'RETURN';
+"<="                       return '<=';
+">="                       return '>=';
+"<"                        return '<';
+">"                        return '>';
+"=="                       return '==';
 "*"                        return '*';
 "/"                        return '/';
 "-"                        return '-';
@@ -28,20 +34,26 @@
 "("                        return '(';
 ")"                        return ')';
 ","                        return ',';
+\"[^\"]*\"                 return 'STRING';
 [0-9]+("."[0-9]+)?\b       return 'NUMBER';
 [A-Za-z]+([0-9A-Za-z])*\b  return 'NAME';
 <<EOF>>                    return 'EOF';
 .                          return 'INVALID';
 
-/lex
+/* " */
 
+
+/lex
 %token FUNDECL
-%token VARDECL
+%token VAR
 %token WHILE
 %token IF
 %token ELSIF
 %token ELSE
 %token RETURN
+%token NAME
+%token NUMBER
+%token STRING
 %token END
 %token EOF
 /* operator associations and precedence */
@@ -50,6 +62,7 @@
 %left NOT
 %left OR
 %left AND
+%left '<' '>' '<=' '>=' '=='
 %left '+' '-'
 %left '*' '/'
 %right '='
@@ -87,7 +100,7 @@ decls
    ;
 
 decl
-   : VARDECL names
+   : VAR names
    ;
 
 optnames
@@ -131,6 +144,13 @@ expr
    | expr '-' expr
    | expr '*' expr
    | expr '/' expr
+   | expr '%' expr
+   | expr '<' expr
+   | expr '>' expr
+   | expr '<=' expr
+   | expr '>=' expr
+   | expr '==' expr
+   | STRING
    //| LITERAL
    | '(' expr ')'
    | ifexpr

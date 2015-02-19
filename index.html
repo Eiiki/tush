@@ -4,6 +4,7 @@
         <title>Tush - Programming language</title>
         <meta charset="UTF-8">
 		<link rel="stylesheet" type="text/css" href="libs/bootstrap.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="libs/font-awesome.css">
         <link rel="stylesheet" type="text/css" href="app.css">
     </head>
@@ -63,24 +64,24 @@
 def func()
     var x;
     var y;
-    x = 0;
-    y = 1;
+    x = 10;
+    y = 5;
 
-    if (x)
-        x = 0;
-    elsif (y)
+    if (x > 5)
+        x = 5;
+    elsif (y < x)
         x = y;
     else
-        x = 1;
+        x = y = 1;
     end;
 
     y = 10;
-    while(y)
+    while(y >= 0)
         y = y - 1;
         x = x + 1;
     end;
 
-    return x;
+    return sum(x,y);
 end
 
 def sum(a, b)
@@ -103,5 +104,6 @@ end
         <script src="libs/ace/src-min-noconflict/ace.js"></script>
         <script src="tush.js"></script>
         <script src="tushGenerator.js"></script>
+        <script src="recursiveDescentParser.js"></script>
     </body>
 </html>

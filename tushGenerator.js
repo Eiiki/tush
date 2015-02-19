@@ -1,5 +1,6 @@
 var tush = parser;
 tush.lexer = parser.lexer;
+var EOF = tush.lexer.EOF;
 
 var editor;
 var initEditor = function(){
@@ -26,33 +27,21 @@ var renderSuccessMessages = function(){
 	$(".parse-content").html(alertBox);
 };
 
-var renderErrorMessages = function(err){
-	var alertBox = $('<div class="alert alert-danger alert-dismissible" role="alert">');
-		alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-		alertBox.append("<strong>"+err+"</strong>");
-	$(".parse-content").html(alertBox);
-};
-
-var lex = function(){
-
-	tush.lexer.setInput(editor.getValue());
-	var tokenID = tush.lexer.lex();
-	var tokenName = tush.terminals_[tokenID];
-	var next = tush.lexer.match;
-	var tableContainer = $("<table class='table table-hover table-scroll'></table>");
-	tableContainer.append("<thead><tr><th> token ID </th><th> Token Name </th><th>Lexed Value</th></tr></thead>");
-	var tableBody = $("<tbody></tbody>");
-	while(tokenID !== 1){
-		$(tableBody).append("<tr><td>"+tokenID+"</td><td>"+tokenName+"</td><td>"+next+"</td></tr>");
-
-		tokenID = tush.lexer.lex();
-		tokenName = tush.terminals_[tokenID];
-		next = tush.lexer.match;
+var renderErrorMessages = function(message, err){
+	if(!err){
+		err = message;
+		message = "";
 	}
-	$(".lex-content").empty();
-	$(tableContainer).append(tableBody);
-	$(".lex-content").append(tableContainer);
-	resizeContent();
+	var alertBox = $('<div class="alert alert-danger alert-dismissible" role="alert">');
+	alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+	alertBox.append("<h5><i class='fa fa-exclamation-circle'></i> "+message+"</h5>");
+	var errMessages = $("<div class='error-messages'></div>");
+	err = err.split("\n")[0];
+	//for(var n = 0; n < err.length; n++){
+		errMessages.append("<p>"+err.toString()+"</p>");
+	//}
+	alertBox.append(errMessages);
+	$(".parse-content").html(alertBox);
 };
 
 var parse = function(){
@@ -62,15 +51,38 @@ var parse = function(){
 	}catch(err){
 		hasNoError = false;
 		renderErrorMessages(err);
-	}finally{
-		if(hasNoError)
-			renderSuccessMessages();
 	}
+	if(hasNoError)
+		renderSuccessMessages();
+};
+
+var lex = function(){
+	tush.lexer.setInput(editor.getValue());
+	var tokenID = tush.lexer.lex();
+	var tokenName = tush.terminals_[tokenID];
+	var next = tush.lexer.match;
+
+	var tableContainer = $("<table class='table table-hover table-scroll'></table>");
+	tableContainer.append("<thead><tr><th> token ID </th><th> Token Name </th><th>Lexed Value</th></tr></thead>");
+	var tableBody = $("<tbody></tbody>");
+
+	while(tokenID !== EOF){
+		$(tableBody).append("<tr><td>"+tokenID+"</td><td>"+tokenName+"</td><td>"+next+"</td></tr>");
+		tokenID = tush.lexer.lex();
+		tokenName = tush.terminals_[tokenID];
+		next = tush.lexer.match;
+	}
+
+	$(".lex-content").empty();
+	$(tableContainer).append(tableBody);
+	$(".lex-content").append(tableContainer);
+	resizeContent();
 };
 
 $(document).ready(function(){
 	initEditor();
 	$("#lexCode").click(lex);
-	$("#parseCode").click(parse);
+	//$("#parseCode").click(parse);
+	$("#parseCode").click(recursiveDescentParse);
 	lex();
 });
