@@ -1,0 +1,27 @@
+def max(a,b,c)
+    var max;
+    if(a > b)
+        if(a > c)
+            return a;
+        elsif(c > a)
+            return c;
+        end;
+    else
+        if(b > c)
+            return b;
+        else
+            return c;
+        end;
+    end;
+end
+
+#finds the n-th fibonacci number
+def fibo(n)
+    if(n == 0)
+        return 0;
+    elsif( n == 1)
+        return 1;
+    else
+        return fibo(n-1) + fibo(n-2);
+    end;
+end

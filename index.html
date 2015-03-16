@@ -1,110 +1,54 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Tush - Programming language</title>
+        <title>I'm just looking for some tush</title>
         <meta charset="UTF-8">
 		<link rel="stylesheet" type="text/css" href="libs/bootstrap.css">
-        <link rel="stylesheet" href="libs/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="libs/font-awesome.css">
         <link rel="stylesheet" type="text/css" href="app.css">
+        <script src="libs/jquery.js"></script>
+        <script src="libs/bootstrap.js"></script>
+        <script src="libs/ace/src-min-noconflict/ace.js"></script>
+        <script src="tushGenerator.js"></script>
+        <script src="recursiveDescentParser.js"></script>
+        <script src="tush.js"></script>
+        <script src="messageGenerator.js"></script>
+        
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-static-top">
             <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Brand</a>
+                    <a class="navbar-brand" href="#">Tush</a>
                 </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav" style="display:none">
                     <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="https://github.com/Eiiki/tush"><i class="fa fa-github"></i>View Source</a></li>
                 </ul>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
+                </div>
+            </div>
         </nav>
+<div class="spinner"><i class="fa fa-spinner fa-pulse"></i></div>
 <div class="container body">
-    <div class="row" style="position:relative">
-    <div class="col-md-7 col-lg-7 editor-content">
-<pre id="editor">
-def func()
-    var x;
-    var y;
-    x = 10;
-    y = 5;
-    #this is a comment
-
-    if (x > 5)
-        x = 5;
-    elsif (y < x)
-        x = y;
-    else
-        x = y = 1;
-    end;
-
-    y = 10;
-    while(y >= 0)
-        y = y - 1;
-        x = x + 1;
-    end;
-
-    return sum(x,y);
-end
-
-def sum(a, b)
-    return a + b;
-end
-</pre>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 messages"></div>
+        <div class="col-lg-7 col-md-7 editor-btn-container">
+            <div class="col-md-9 col-lg-9 editor-content">
+                <pre id="editor"></pre>
+            </div>
+            <div class="col-md-3 col-lg-3 buttons-container">
+                <div id="lexCode">Lex</div>
+                <div id="recursiveDescentParse">Recursive Descent Parse</div>
+                <div id="parseCode">Parse</div>
+            </div>
         </div>
         <div class="col-md-5 col-lg-5 lex-content parse-content"></div>
     </div>
-    <div class="col-md-12 col-lg-12" style="margin-top:20px">
-        <div class="btn-group pull-right" role="group">
-            <button type="button" id="lexCode" class="btn btn-default">Lex</button>
-            <button type="button" id="parseCode" class="btn btn-primary">Parse</button>
-        </div>
-    </div>
 </div>
-
-        <script src="libs/jquery.js"></script>
-        <script src="libs/bootstrap.js"></script>
-        <script src="libs/ace/src-min-noconflict/ace.js"></script>
-        <script src="tush.js"></script>
-        <script src="tushGenerator.js"></script>
-        <script src="recursiveDescentParser.js"></script>
     </body>
 </html>

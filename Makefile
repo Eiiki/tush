@@ -1,4 +1,4 @@
 compile:
 	jison tush.jison
 test:
-	node tush.js test.tsh
+	node tush.js code.tsh

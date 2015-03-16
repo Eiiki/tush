@@ -1,60 +1,25 @@
-var tush = parser;
-tush.lexer = parser.lexer;
-var EOF = tush.lexer.EOF;
+var tush;
+var EOF;
+var emittedProgram = [];
 
-var editor;
-var initEditor = function(){
-	editor = ace.edit("editor");
-	editor.setTheme("ace/theme/monokai");
-	editor.getSession().setMode("ace/mode/ruby");
-	editor.setAutoScrollEditorIntoView(true);
-	editor.setAutoScrollEditorIntoView(true);
-	editor.setOption("minLines", 32);
-    editor.setOption("maxLines", 32);
-    editor.setFontSize(13);
-};
-
-var resizeContent = function(){
-	var desiredHeight = $(".editor-content").height();
-	$(".lex-content").height(desiredHeight);
-	$(".lex-content table.table-scroll").height(desiredHeight);
-};
-
-var renderSuccessMessages = function(){
-	var alertBox = $('<div class="alert alert-success alert-dismissible" role="alert">');
-		alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-		alertBox.append("<strong>Þáttaðist!</strong>");
-	$(".parse-content").html(alertBox);
-};
-
-var renderErrorMessages = function(message, err){
-	if(!err){
-		err = message;
-		message = "";
-	}
-	var alertBox = $('<div class="alert alert-danger alert-dismissible" role="alert">');
-	alertBox.append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-	alertBox.append("<h5><i class='fa fa-exclamation-circle'></i> "+message+"</h5>");
-	var errMessages = $("<div class='error-messages'></div>");
-	err = err.split("\n")[0];
-	//for(var n = 0; n < err.length; n++){
-	//	errMessages.append("<p>"+err[n].toString()+"</p>");
-	//}
-	errMessages.append("<p>"+err.toString()+"</p>");
-	alertBox.append(errMessages);
-	$(".parse-content").html(alertBox);
+var emit = function(val){
+	emittedProgram.push(val.toString());
 };
 
 var parse = function(){
 	var hasNoError = true;
+	emittedProgram = [];
 	try{
 		tush.parse(editor.getValue());
 	}catch(err){
 		hasNoError = false;
-		renderErrorMessages(err);
+		console.log(err);
+		renderErrorMessages(err.message);
 	}
-	if(hasNoError)
-		renderSuccessMessages();
+	if(hasNoError){
+		renderSuccessMessages(emittedProgram);
+		console.log(emittedProgram);
+	}
 };
 
 var lex = function(){
@@ -81,9 +46,19 @@ var lex = function(){
 };
 
 $(document).ready(function(){
-	initEditor();
-	$("#lexCode").click(lex);
-	//$("#parseCode").click(parse);
-	$("#parseCode").click(recursiveDescentParse);
-	lex();
+	$(".spinner").show();
+	$(".container.body").hide();
+	$.get("code.tsh", success = function(content){
+		tush = parser;
+		EOF = tush.lexer.EOF;
+		$(".spinner").fadeOut("slow");
+		$(".container.body").fadeIn("slow");
+		$("pre#editor").text(content);
+		initEditor();
+		$("#lexCode").click(lex);
+		$("#parseCode").click(parse);
+		$("#recursiveDescentParse").click(recursiveDescentParse);
+		lex();
+
+	});
 });

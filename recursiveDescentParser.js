@@ -9,28 +9,26 @@ next_token.name = null;
 function ParsingError(message) {
     this.name = "ParsingError";
     this.message = (message || "");
-}
+};
 ParsingError.prototype = Error.prototype;
 
 var constructError = function(token){
 	try{
-		if(true){
-			var lineNo = tush.lexer.yylloc.first_line;
-			if(token)
-				throw new ParsingError("Error on line "+lineNo+". Expected "+token+", found "+next_token.name);
-			else
-				throw new ParsingError("Error on line "+lineNo+". Unexpected token "+next_token.name);
-		}
+		var lineNo = tush.lexer.yylloc.first_line;
+		if(token)
+			throw new ParsingError("Error on line "+lineNo+". Expected "+token+", found "+next_token.name);
+		else
+			throw new ParsingError("Error on line "+lineNo+". Unexpected token "+next_token.name);
 	}catch(err){
 		renderErrorMessages(err.message, tush.lexer.showPosition());
 		throw Error("Parsing unsuccessful");
 	}
-}
+};
 
 var advance = function(){
 	next_token.ID 	= tush.lexer.lex();
 	next_token.name = tush.terminals_[next_token.ID];
-	console.log(next_token.ID, next_token.name);
+	//console.log(next_token.ID, next_token.name);
 };
 
 var over = function(token){
@@ -209,6 +207,7 @@ var program = function(){
 };
 
 var recursiveDescentParse = function(){
+	//We start by getting the program text which we want to parse and put it into the lexer.
 	tush.lexer.setInput(editor.getValue());
 	advance();
 	program();
