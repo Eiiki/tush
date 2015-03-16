@@ -96,3 +96,6 @@ table.table-scroll{
 .table-scroll th{
 	width:33%;
 }
+.parsed-output{
+	display: none;
+}

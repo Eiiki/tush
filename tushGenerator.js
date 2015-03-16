@@ -18,7 +18,6 @@ var parse = function(){
 	}
 	if(hasNoError){
 		renderSuccessMessages(emittedProgram);
-		console.log(emittedProgram);
 	}
 };
 
@@ -55,10 +54,21 @@ $(document).ready(function(){
 		$(".container.body").fadeIn("slow");
 		$("pre#editor").text(content);
 		initEditor();
-		$("#lexCode").click(lex);
-		$("#parseCode").click(parse);
-		$("#recursiveDescentParse").click(recursiveDescentParse);
+		$("#lexCode").click(function(){
+			$(".lex-content").show();
+			$(".second-editor").hide();
+			lex();
+		});
+		$("#parseCode").click(function(){
+			$(".lex-content").hide();
+			$(".second-editor").show();
+			parse();
+		});
+		$("#recursiveDescentParse").click(function(){
+			$(".lex-content").show();
+			$(".second-editor").hide();
+			recursiveDescentParse();
+		});
 		lex();
-
 	});
 });
