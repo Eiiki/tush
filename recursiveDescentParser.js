@@ -6,12 +6,6 @@ var next_token = {};
 next_token.ID = null;
 next_token.name = null;
 
-function ParsingError(message) {
-    this.name = "ParsingError";
-    this.message = (message || "");
-};
-ParsingError.prototype = Error.prototype;
-
 var constructError = function(token){
 	try{
 		var lineNo = tush.lexer.yylloc.first_line;

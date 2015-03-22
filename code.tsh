@@ -25,3 +25,8 @@ def fibo(n)
         return fibo(n-1) + fibo(n-2);
     end;
 end
+
+def main()
+    println("max(1,2,3) = " ++ max(1,2,3));
+    println("fibo(10) = " ++ fibo(10));
+end

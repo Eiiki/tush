@@ -28,11 +28,11 @@
 "<"                        return '<';
 ">"                        return '>';
 "=="                       return '==';
+"++"                       return '++';
 "*"                        return '*';
 "/"                        return '/';
 "-"                        return '-';
 "+"                        return '+';
-"++"                       return '++';
 "%"                        return '%';
 "="                        return '=';
 "("                        return '(';
@@ -275,22 +275,23 @@ var functions = {};
 //var exprs = {}; //will use for micro-morpho
 
 var programName = "test";
+var emit;
+var errConstruct;
+var errMessage;
 if(this.process !== undefined){
    var fs = require('fs');
    var emittedProgram = [];
-   var emit = function(x){
-      emittedProgram.push(x.toString());
+   emit = function(code){
+      emittedProgram.push(code.toString());
+   };
+   errConstruct = function(code){
+      errMessage = code;
    };
    var argv = this.process.argv;
    programName = argv[argv.length - 1].split(".")[0];
 } else {
    emit = window.emit;
-}
-
-var log = function(val){
-   if(this.process !== undefined){
-      console.log(val);
-   }
+   errConstruct = window.throwParsingError;
 }
 
 var nextLab = 1;
@@ -324,6 +325,10 @@ var generateExpr = function(expr){
 
    }
    else if(type === "FETCH"){
+      if(isNaN(varTable[expr.name])){
+         errConstruct("Variable "+expr.name+" is undefined");
+         return;
+      }
       emit('(Fetch '+varTable[expr.name]+')');
    }
    else if(type === "LITERAL"){
@@ -408,7 +413,7 @@ var generateFunction = function(name, func){
 
 var generateCode = function(){
    nextLab = 1;
-   emit('"'+programName+'.mexe" =');
+   emit('"'+programName+'.mexe" = main in');
    emit('!{{');
    for(n in functions){
       var func = functions[n];
@@ -416,8 +421,23 @@ var generateCode = function(){
    }
    emit('}}*BASIS;');
    if(this.process !== undefined){
-      for(var n = 0; n < emittedProgram.length; n++){
-         console.log(emittedProgram[n]);
+      if(!errMessage){
+         var programToFile = "";
+         for(var n = 0; n < emittedProgram.length; n++){
+            programToFile += emittedProgram[n];
+            programToFile += "\n";
+            //console.log(emittedProgram[n]);
+         }
+         fs.writeFile(programName+".mexe", programToFile, function(err) {
+            if(err) {
+               return console.log(err);
+            }
+
+            console.log("Parsed successfully to "+programName+".mexe");
+         }); 
+      }else{
+         console.log("Parsing unsuccessfull");
+         console.log(errMessage);
       }
    }
 };

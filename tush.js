@@ -389,22 +389,23 @@ var functions = {};
 //var exprs = {}; //will use for micro-morpho
 
 var programName = "test";
+var emit;
+var errConstruct;
+var errMessage;
 if(this.process !== undefined){
    var fs = require('fs');
    var emittedProgram = [];
-   var emit = function(x){
-      emittedProgram.push(x.toString());
+   emit = function(code){
+      emittedProgram.push(code.toString());
+   };
+   errConstruct = function(code){
+      errMessage = code;
    };
    var argv = this.process.argv;
    programName = argv[argv.length - 1].split(".")[0];
 } else {
    emit = window.emit;
-}
-
-var log = function(val){
-   if(this.process !== undefined){
-      console.log(val);
-   }
+   errConstruct = window.throwParsingError;
 }
 
 var nextLab = 1;
@@ -438,6 +439,10 @@ var generateExpr = function(expr){
 
    }
    else if(type === "FETCH"){
+      if(isNaN(varTable[expr.name])){
+         errConstruct("Variable "+expr.name+" is undefined");
+         return;
+      }
       emit('(Fetch '+varTable[expr.name]+')');
    }
    else if(type === "LITERAL"){
@@ -522,7 +527,7 @@ var generateFunction = function(name, func){
 
 var generateCode = function(){
    nextLab = 1;
-   emit('"'+programName+'.mexe" =');
+   emit('"'+programName+'.mexe" = main in');
    emit('!{{');
    for(n in functions){
       var func = functions[n];
@@ -530,8 +535,23 @@ var generateCode = function(){
    }
    emit('}}*BASIS;');
    if(this.process !== undefined){
-      for(var n = 0; n < emittedProgram.length; n++){
-         console.log(emittedProgram[n]);
+      if(!errMessage){
+         var programToFile = "";
+         for(var n = 0; n < emittedProgram.length; n++){
+            programToFile += emittedProgram[n];
+            programToFile += "\n";
+            //console.log(emittedProgram[n]);
+         }
+         fs.writeFile(programName+".mexe", programToFile, function(err) {
+            if(err) {
+               return console.log(err);
+            }
+
+            console.log("Parsed successfully to "+programName+".mexe");
+         }); 
+      }else{
+         console.log("Parsing unsuccessfull");
+         console.log(errMessage);
       }
    }
 };
@@ -914,15 +934,15 @@ case 23:return 32;
 break;
 case 24:return 35;
 break;
-case 25:return 28;
+case 25:return 26;
 break;
-case 26:return 29;
+case 26:return 28;
 break;
-case 27:return 27;
+case 27:return 29;
 break;
-case 28:return 25;
+case 28:return 27;
 break;
-case 29:return 26;
+case 29:return 25;
 break;
 case 30:return 30;
 break;
@@ -946,7 +966,7 @@ case 39:return 'INVALID';
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:^#.*)/,/^(?:not\b)/,/^(?:!)/,/^(?:or\b)/,/^(?:\|\|)/,/^(?:and\b)/,/^(?:&&)/,/^(?:var\b)/,/^(?:def\b)/,/^(?:while\b)/,/^(?:if\b)/,/^(?:elsif\b)/,/^(?:else\b)/,/^(?:end\b)/,/^(?:;)/,/^(?:return\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:null\b)/,/^(?:<=)/,/^(?:>=)/,/^(?:<)/,/^(?:>)/,/^(?:==)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\+\+)/,/^(?:%)/,/^(?:=)/,/^(?:\()/,/^(?:\))/,/^(?:,)/,/^(?:"[^\"]*")/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:[A-Za-z]+([0-9A-Za-z])*\b)/,/^(?:$)/,/^(?:.)/],
+rules: [/^(?:\s+)/,/^(?:^#.*)/,/^(?:not\b)/,/^(?:!)/,/^(?:or\b)/,/^(?:\|\|)/,/^(?:and\b)/,/^(?:&&)/,/^(?:var\b)/,/^(?:def\b)/,/^(?:while\b)/,/^(?:if\b)/,/^(?:elsif\b)/,/^(?:else\b)/,/^(?:end\b)/,/^(?:;)/,/^(?:return\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:null\b)/,/^(?:<=)/,/^(?:>=)/,/^(?:<)/,/^(?:>)/,/^(?:==)/,/^(?:\+\+)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:%)/,/^(?:=)/,/^(?:\()/,/^(?:\))/,/^(?:,)/,/^(?:"[^\"]*")/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:[A-Za-z]+([0-9A-Za-z])*\b)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],"inclusive":true}}
 });
 return lexer;

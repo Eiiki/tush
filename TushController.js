@@ -13,8 +13,8 @@ var parse = function(){
 		tush.parse(editor.getValue());
 	}catch(err){
 		hasNoError = false;
-		console.log(err);
 		renderErrorMessages(err.message);
+		initParseEditor("Parsing error");
 	}
 	if(hasNoError){
 		renderSuccessMessages(emittedProgram);
