@@ -5,12 +5,6 @@
 
 \s+                        /* skip whitespace */
 ^\#.*                      /* skip comments */ 
-"not"                      return 'NOT';
-"!"                        return 'NOT';
-"or"                       return 'OR';
-"||"                       return 'OR';
-"and"                      return 'AND';
-"&&"                       return 'AND';
 "var"                      return 'VAR';
 "def"                      return 'FUNDECL';
 "while"                    return 'WHILE';
@@ -23,6 +17,12 @@
 "true"                     return 'TRUE';
 "false"                    return 'FALSE';
 "null"                     return 'NULL';
+"not"                      return 'NOT';
+"!"                        return 'NOT';
+"or"                       return 'OR';
+"||"                       return 'OR';
+"and"                      return 'AND';
+"&&"                       return 'AND';
 "<="                       return '<=';
 ">="                       return '>=';
 "<"                        return '<';
@@ -49,6 +49,9 @@
 
 /lex
 %token FUNDECL
+%token NOT
+%token OR
+%token AND
 %token VAR
 %token WHILE
 %token IF
@@ -205,6 +208,9 @@ expr:
    |  expr '<=' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
    |  expr '>=' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
    |  expr '==' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
+   |  expr AND expr           { $$ = {type: "AND", exprs: [$1, $3]}; }
+   |  expr OR expr            { $$ = {type: "OR", exprs: [$1, $3]}; }
+   |  NOT expr                { $$ = {type: "NOT", val: $2}; }
    |  NAME                    { $$ = {type: "FETCH", name: $1}; }
    |  RETURN expr             { $$ = {type: "RETURN",  val: $2}; }
    |  NUMBER                  { $$ = {type: "LITERAL", val: $1}; }
@@ -341,10 +347,10 @@ var generateExpr = function(expr){
       var conds = expr.conds;
       var bodies = expr.bodies;
       var startLabel = newLab();
-      var endLabel = startLabel+conds.length;
+      var endLabel = newLab();
 
       for(var n = 0; n < conds.length; n++){
-         var nextLab = parseInt(newLab() - 1);
+         var nextLab = newLab();
          generateExpr(conds[n]);
          emit('(GoFalse _L'+nextLab+')');
          generateExpr(bodies[n]);
@@ -379,6 +385,24 @@ var generateExpr = function(expr){
       for(var n = 0; n < expr.exprs.length; n++){
          generateExpr(expr.exprs[n]);
       }
+   }
+   else if(type === "AND"){
+      var falseLab = newLab();
+      generateExpr(expr.exprs[0]);
+      emit('(GoFalse _L'+falseLab+')');
+      generateExpr(expr.exprs[1]);
+      emit('_L'+falseLab+':');
+   }
+   else if(type === "OR"){
+      var trueLab = newLab();
+      generateExpr(expr.exprs[0]);
+      emit('(GoTrue _L'+trueLab+')');
+      generateExpr(expr.exprs[1]);
+      emit('_L'+trueLab+':');
+   }
+   else if(type === "NOT"){
+      generateExpr(expr.val);
+      emit('(Not)');
    }
 };
 

@@ -47,6 +47,7 @@ var lex = function(){
 $(document).ready(function(){
 	$(".spinner").show();
 	$(".container.body").hide();
+	numLines = (((($(window).height() - 40) - ($(".navbar").height() || 53)) / 17) - 1) || 35;
 	$.get("code.tsh", success = function(content){
 		tush = parser;
 		EOF = tush.lexer.EOF;

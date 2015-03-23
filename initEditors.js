@@ -1,12 +1,13 @@
 var editor;
 var parseEditor;
+var numLines;
 var initEditor = function(){
 	editor = ace.edit("editor");
 	editor.setTheme("ace/theme/monokai");
 	editor.getSession().setMode("ace/mode/ruby");
 	editor.setAutoScrollEditorIntoView(true);
-	editor.setOption("minLines", 35);
-    editor.setOption("maxLines", 35);
+	editor.setOption("minLines", numLines);
+    editor.setOption("maxLines", numLines);
     editor.setFontSize(13);
 };
 
@@ -23,8 +24,8 @@ var initParseEditor = function(val){
 	parseEditor = ace.edit("parseEditor");
 	parseEditor.getSession().setMode("ace/mode/ruby");
 	parseEditor.setAutoScrollEditorIntoView(true);
-	parseEditor.setOption("minLines", 35);
-    parseEditor.setOption("maxLines", 35);
+	parseEditor.setOption("minLines", numLines);
+    parseEditor.setOption("maxLines", numLines);
     parseEditor.setReadOnly(true);
     parseEditor.setFontSize(13);
 };
