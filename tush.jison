@@ -1,3 +1,4 @@
+// Made by Eirikur Ingi Magnusson, eim5@hi.is
 
 /* lexical grammar */
 %lex
@@ -104,7 +105,7 @@ functions:
    ;
 
 fundecl:
-      FUNDECL NAME '(' optnames ')' optdecls exprs END
+      FUNDECL NAME '(' optargs ')' optdecls exprs END
       %{
          var funcName = $2;
          //functions are kept as a dictionary objects
@@ -144,12 +145,51 @@ decl
       %}
    ;
 
-optnames:  
-      %{  /* Optional names are optional */
-         $$ = [];  
+optargs: 
+      %{  /* Optional arguments are optional */
+         $$ = [];
       %}
-   |  names
+   |  argsnodecl                    { $$ = { nodecls: $1, decls: [] }; }
+   |  argswithdecl                  { $$ = { nodecls: [], decls: $1 }; }
+   |  argsnodecl ',' argswithdecl   { $$ = { nodecls: $1, decls: $3 }; }
    ;
+
+argsnodecl:
+      argsnodecl ',' argnodecl
+      %{
+         $1.push($3);
+         $$ = $1;
+      %}
+   |  argnodecl
+      %{
+         $$ = [$1];
+      %}
+   ;
+
+argswithdecl:
+      argswithdecl ',' argwithdecl
+      %{
+         $1.push($3);
+         $$ = $1;
+      %}
+   |  argwithdecl
+      %{
+         $$ = [$1];
+      %}
+   ;
+
+argnodecl:
+      NAME              { $$ = { name: $1, val: null }; }
+   ;
+
+argwithdecl:
+      NAME '=' NUMBER   { $$ = { name: $1, val: $3   }; }
+   |  NAME '=' TRUE     { $$ = { name: $1, val: $3   }; }
+   |  NAME '=' FALSE    { $$ = { name: $1, val: $3   }; }
+   |  NAME '=' NULL     { $$ = { name: $1, val: $3   }; }
+   |  NAME '=' STRING   { $$ = { name: $1, val: $3   }; }
+   ;
+
 
 names: 
       names ',' NAME
@@ -196,22 +236,22 @@ exprlist:
 
 expr: 
       NAME '=' expr           { $$ = {type: "STORE", name: $1, val: $3}; }
-   |  NAME '(' optexprs ')'   { $$ = {type: "CALL",  name: $1, exprs: $3}; }
-   |  expr '+' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '++' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '-' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '*' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '/' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '%' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '<' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '>' expr           { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '<=' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '>=' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr '==' expr          { $$ = {type: "CALL",  name: $2, exprs: [$1, $3]}; }
-   |  expr AND expr           { $$ = {type: "AND", exprs: [$1, $3]}; }
-   |  expr OR expr            { $$ = {type: "OR", exprs: [$1, $3]}; }
-   |  NOT expr                { $$ = {type: "NOT", val: $2}; }
-   |  NAME                    { $$ = {type: "FETCH", name: $1}; }
+   |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC",  name: $1, exprs: $3 }; }
+   |  expr '+' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '++' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '-' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '*' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '/' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '%' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '<' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '>' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '<=' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '>=' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr '==' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  expr AND expr           { $$ = {type: "AND",     exprs: [$1, $3]}; }
+   |  expr OR expr            { $$ = {type: "OR",      exprs: [$1, $3]}; }
+   |  NOT expr                { $$ = {type: "NOT",     val: $2}; }
+   |  NAME                    { $$ = {type: "FETCH",   name: $1}; }
    |  RETURN expr             { $$ = {type: "RETURN",  val: $2}; }
    |  NUMBER                  { $$ = {type: "LITERAL", val: $1}; }
    |  STRING                  { $$ = {type: "LITERAL", val: $1}; }
@@ -321,14 +361,59 @@ var generateExpr = function(expr){
       generateExpr(expr.val);
       emit('(Store '+varTable[expr.name]+')');
    }
-   else if(type === "CALL"){
+   else if(type === "CALLFUNC"){
+      if(functions[expr.name]){
+         var numParams = 0;
+         var params = expr.exprs; //parameters sent to function
+         var argsIn = functions[expr.name].args; //arguments used in function
+
+         if(argsIn.hasOwnProperty('nodecls')){
+            if(params.length < argsIn.nodecls.length){
+               errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
+                           expr.name+"' ("+params.length+" for "+argsIn.nodecls.length+")>"
+                           );
+            }
+            else if(params.length > argsIn.nodecls.length + argsIn.decls.length){
+               errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
+                           expr.name+"' ("+params.length+" for "+parseInt(argsIn.nodecls.length+argsIn.decls.length)+")>"
+                           );
+            }
+            else{
+               var numArgsWithDecl = argsIn.nodecls.length + argsIn.decls.length - params.length;
+               for(var n = 0; n < params.length; n++){
+                  generateExpr(params[n]);
+                  if(n+1 !== params.length){
+                     emit('(Push)');
+                  }
+                  numParams++;
+               }
+               var i = argsIn.decls.length - numArgsWithDecl;
+               while(i !== argsIn.decls.length){
+                  if(params.length > 0){
+                     emit('(Push)');
+                  }
+                  emit('(MakeVal '+argsIn.decls[i].val+')');
+                  i++;
+                  numParams++;
+               }
+            }
+         }
+         emit('(Call #"'+expr.name+'[f'+numParams+']" '+numParams+')');
+      }else{
+         for(var n = 0; n < expr.exprs.length; n++){
+            generateExpr(expr.exprs[n]);
+            if(n+1 !== expr.exprs.length)
+               emit('(Push)');
+         }
+         emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
+      }
+   }else if(type === "CALLOP"){
       for(var n = 0; n < expr.exprs.length; n++){
          generateExpr(expr.exprs[n]);
          if(n+1 !== expr.exprs.length)
             emit('(Push)');
       }
       emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
-
    }
    else if(type === "FETCH"){
       if(isNaN(varTable[expr.name])){
@@ -418,10 +503,20 @@ var generateFunction = function(name, func){
    var decls = func.decls;
    var exprs = func.exprs;
 
-   emit('#"'+name+'[f'+args.length+']"=');
+   var argsLen = 0;
+   if(args.hasOwnProperty('nodecls')){
+      argsLen += args.nodecls.length + args.decls.length;
+   }
+
+   emit('#"'+name+'[f'+argsLen+']"=');
    emit('[');
-   for(var n = 0; n < args.length; n++){
-      varTable[args[n]] = newID();
+   if(argsLen > 0){
+      for(var n = 0; n < args.nodecls.length; n++){
+         varTable[args.nodecls[n].name] = newID();
+      }
+      for(var n = 0; n < args.decls.length; n++){
+         varTable[args.decls[n].name] = newID();
+      }
    }
    for(var n = 0; n < decls.length; n++){
       if(n === 0)
@@ -454,7 +549,8 @@ var generateCode = function(){
          }
          fs.writeFile(programName+".mexe", programToFile, function(err) {
             if(err) {
-               return console.log(err);
+               console.log(err);
+               return;
             }
 
             console.log("Parsed successfully to "+programName+".mexe");
