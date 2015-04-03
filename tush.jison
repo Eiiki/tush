@@ -38,6 +38,8 @@
 "="                        return '=';
 "("                        return '(';
 ")"                        return ')';
+"["                        return '[';
+"]"                        return ']';
 ","                        return ',';
 \"[^\"]*\"                 return 'STRING';
 [0-9]+("."[0-9]+)?\b       return 'NUMBER';
@@ -234,6 +236,27 @@ exprlist:
       %}
    ;
 
+list:
+      '[' ']'              { $$ = null; }
+   |  '[' listelements ']' { $$ = $2;   }
+   ;
+
+listelements:
+     listelements ',' listelement
+      %{
+         $1.push($3);
+         $$ = $1;
+      %}
+   |  listelement
+      %{
+         $$ = [$1];
+      %}
+   ;
+
+listelement:
+      expr  { $$ = $1; } 
+   ;
+
 expr: 
       NAME '=' expr           { $$ = {type: "STORE", name: $1, val: $3}; }
    |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC",  name: $1, exprs: $3 }; }
@@ -243,6 +266,7 @@ expr:
    |  expr '*' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '/' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '%' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
+   |  '-' expr %prec UMINUS   { $$ = {type: "CALLOP",  name: $1, exprs: [$2] }; }
    |  expr '<' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '>' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '<=' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
@@ -258,6 +282,7 @@ expr:
    |  TRUE                    { $$ = {type: "LITERAL", val: $1}; }
    |  FALSE                   { $$ = {type: "LITERAL", val: $1}; }
    |  NULL                    { $$ = {type: "LITERAL", val: $1}; }
+   |  list                    { $$ = {type: "LIST",    val: $1 }; }
    |  '(' expr ')'            { $$ = {type: "()",      val: $2}; }
    |  ifexpr
    |  WHILE '(' expr ')' body END   { $$ = {type: "WHILE", cond: $3, body: $5}; }
@@ -425,6 +450,19 @@ var generateExpr = function(expr){
    else if(type === "LITERAL"){
       emit('(MakeVal '+expr.val+')');
    }
+   else if(type === "LIST"){
+      if(expr.val === null){
+         emit('(MakeVal null)');
+      }else{
+         for(var n = 0; n < expr.val.length; n++){
+            generateExpr(expr.val[n]);
+            if(n+1 !== expr.val.length){
+               emit('(Push)');
+            }
+         }
+         emit('(List '+expr.val.length+')');
+      }
+   }
    else if(type === "()"){
       generateExpr(expr.val);
    }
@@ -488,6 +526,9 @@ var generateExpr = function(expr){
    else if(type === "NOT"){
       generateExpr(expr.val);
       emit('(Not)');
+   }
+   else{
+      //No, we don't need no else
    }
 };
 
