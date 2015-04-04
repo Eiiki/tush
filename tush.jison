@@ -91,7 +91,7 @@
 program
    :  functions EOF
       %{
-         generateCode();
+         generateProgram();
       %}
    ;
 
@@ -147,6 +147,23 @@ decl
       %}
    ;
 
+names:
+      names ',' nameoptval
+      %{
+         $1.push($3);
+         $$ = $1;
+      %}
+   |  nameoptval
+      %{
+         $$ = [$1];
+      %}
+   ;
+
+nameoptval:
+      NAME              { $$ = {decl: $1, val: null }; }
+   |  NAME '=' expr     { $$ = {decl: $1, val: $3 }; }
+   ;
+
 optargs: 
       %{  /* Optional arguments are optional */
          $$ = [];
@@ -190,19 +207,6 @@ argwithdecl:
    |  NAME '=' FALSE    { $$ = { name: $1, val: $3   }; }
    |  NAME '=' NULL     { $$ = { name: $1, val: $3   }; }
    |  NAME '=' STRING   { $$ = { name: $1, val: $3   }; }
-   ;
-
-
-names: 
-      names ',' NAME
-      %{
-         $1.push($3);
-         $$ = $1;
-      %}
-   |  NAME
-      %{
-         $$ = [$1];
-      %}
    ;
 
 exprs: 
@@ -258,8 +262,8 @@ listelement:
    ;
 
 expr: 
-      NAME '=' expr           { $$ = {type: "STORE", name: $1, val: $3}; }
-   |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC",  name: $1, exprs: $3 }; }
+      NAME '=' expr           { $$ = {type: "STORE",   name: $1, val: $3}; }
+   |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC",name: $1, exprs: $3 }; }
    |  expr '+' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '++' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
    |  expr '-' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
@@ -545,12 +549,14 @@ var generateFunction = function(name, func){
    var exprs = func.exprs;
 
    var argsLen = 0;
+   //If it is a function that takes in arguments
    if(args.hasOwnProperty('nodecls')){
       argsLen += args.nodecls.length + args.decls.length;
    }
 
    emit('#"'+name+'[f'+argsLen+']"=');
    emit('[');
+   //Arguments passed to function
    if(argsLen > 0){
       for(var n = 0; n < args.nodecls.length; n++){
          varTable[args.nodecls[n].name] = newID();
@@ -559,11 +565,16 @@ var generateFunction = function(name, func){
          varTable[args.decls[n].name] = newID();
       }
    }
+   //Declerations made in function
    for(var n = 0; n < decls.length; n++){
-      if(n === 0)
+      if(decls[n].val === null){
          emit('(MakeVal null)');
-      generateDecl(decls[n]);
+      }else{
+         generateExpr(decls[n].val);
+      }
+      generateDecl(decls[n].decl);
    }
+   //Expressions in function
    for(var n = 0; n < exprs.length; n++){
       generateExpr(exprs[n]);
    }
@@ -571,7 +582,7 @@ var generateFunction = function(name, func){
    emit('];');
 };
 
-var generateCode = function(){
+var generateProgram = function(){
    nextLab = 1;
    emit('"'+programName+'.mexe" = main in');
    emit('!{{');
@@ -580,21 +591,20 @@ var generateCode = function(){
       generateFunction(n, func);
    }
    emit('}}*BASIS;');
+
    if(this.process !== undefined){
       if(!errMessage){
          var programToFile = "";
          for(var n = 0; n < emittedProgram.length; n++){
             programToFile += emittedProgram[n];
             programToFile += "\n";
-            //console.log(emittedProgram[n]);
          }
          fs.writeFile(programName+".mexe", programToFile, function(err) {
             if(err) {
                console.log(err);
-               return;
+            }else{
+               console.log("Parsed successfully to "+programName+".mexe");
             }
-
-            console.log("Parsed successfully to "+programName+".mexe");
          }); 
       }else{
          console.log("Parsing unsuccessfull");
