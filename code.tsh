@@ -26,6 +26,7 @@ def min(a,b)
     end;
 end
 
+#example of tail recursion
 def lastEl(lis, n=null)
     if(lis == null)
         return n;

@@ -262,32 +262,32 @@ listelement:
    ;
 
 expr: 
-      NAME '=' expr           { $$ = {type: "STORE",   name: $1, val: $3}; }
-   |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC",name: $1, exprs: $3 }; }
-   |  expr '+' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '++' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '-' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '*' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '/' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '%' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  '-' expr %prec UMINUS   { $$ = {type: "CALLOP",  name: $1, exprs: [$2] }; }
-   |  expr '<' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '>' expr           { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '<=' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '>=' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr '==' expr          { $$ = {type: "CALLOP",  name: $2, exprs: [$1, $3] }; }
-   |  expr AND expr           { $$ = {type: "AND",     exprs: [$1, $3]}; }
-   |  expr OR expr            { $$ = {type: "OR",      exprs: [$1, $3]}; }
-   |  NOT expr                { $$ = {type: "NOT",     val: $2}; }
-   |  NAME                    { $$ = {type: "FETCH",   name: $1}; }
-   |  RETURN expr             { $$ = {type: "RETURN",  val: $2}; }
-   |  NUMBER                  { $$ = {type: "LITERAL", val: $1}; }
-   |  STRING                  { $$ = {type: "LITERAL", val: $1}; }
-   |  TRUE                    { $$ = {type: "LITERAL", val: $1}; }
-   |  FALSE                   { $$ = {type: "LITERAL", val: $1}; }
-   |  NULL                    { $$ = {type: "LITERAL", val: $1}; }
-   |  list                    { $$ = {type: "LIST",    val: $1 }; }
-   |  '(' expr ')'            { $$ = {type: "()",      val: $2}; }
+      NAME '=' expr           { $$ = {type: "STORE",    name: $1, val: $3}; }
+   |  NAME '(' optexprs ')'   { $$ = {type: "CALLFUNC", name: $1, exprs: $3 }; }
+   |  expr '+' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '++' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '-' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '*' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '/' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '%' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  '-' expr %prec UMINUS   { $$ = {type: "CALLOP",   name: $1, exprs: [$2] }; }
+   |  expr '<' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '>' expr           { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '<=' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '>=' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '==' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr AND expr           { $$ = {type: "AND",      exprs: [$1, $3]}; }
+   |  expr OR expr            { $$ = {type: "OR",       exprs: [$1, $3]}; }
+   |  NOT expr                { $$ = {type: "NOT",      val: $2}; }
+   |  NAME                    { $$ = {type: "FETCH",    name: $1}; }
+   |  RETURN expr             { $$ = {type: "RETURN",   val: $2}; }
+   |  NUMBER                  { $$ = {type: "LITERAL",  val: $1}; }
+   |  STRING                  { $$ = {type: "LITERAL",  val: $1}; }
+   |  TRUE                    { $$ = {type: "LITERAL",  val: $1}; }
+   |  FALSE                   { $$ = {type: "LITERAL",  val: $1}; }
+   |  NULL                    { $$ = {type: "LITERAL",  val: $1}; }
+   |  list                    { $$ = {type: "LIST",     val: $1 }; }
+   |  '(' expr ')'            { $$ = {type: "()",       val: $2}; }
    |  ifexpr
    |  WHILE '(' expr ')' body END   { $$ = {type: "WHILE", cond: $3, body: $5}; }
    ;
@@ -372,89 +372,82 @@ if(this.process !== undefined){
 var nextLab = 1;
 var ID = 0;
 var varTable = {};
+var hasReturned = false;
 var newLab = function(){
    return nextLab++;
-}
+};
 
 var newID = function(){
    return ID++;
-}
+};
 
-var generateExpr = function(expr){
-   var type = expr.type;
+//PreExpr is an object containing the functions needed for the prework of some of the expressions.
+//This was implemented due to the tail recursion in the language and als to reduce code..
+var preExpr = {
+   tushFunc : function(expr){
+      var numParams = 0;
+      var params = expr.exprs; //parameters sent to function
+      var argsIn = functions[expr.name].args; //arguments used in function
 
-   if(!type){
-      return;
-   }
-   else if(type === "STORE"){
-      generateExpr(expr.val);
-      emit('(Store '+varTable[expr.name]+')');
-   }
-   else if(type === "CALLFUNC"){
-      if(functions[expr.name]){
-         var numParams = 0;
-         var params = expr.exprs; //parameters sent to function
-         var argsIn = functions[expr.name].args; //arguments used in function
-
-         if(argsIn.hasOwnProperty('nodecls')){
-            if(params.length < argsIn.nodecls.length){
-               errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
-                           expr.name+"' ("+params.length+" for "+argsIn.nodecls.length+")>"
-                           );
-            }
-            else if(params.length > argsIn.nodecls.length + argsIn.decls.length){
-               errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
-                           expr.name+"' ("+params.length+" for "+parseInt(argsIn.nodecls.length+argsIn.decls.length)+")>"
-                           );
-            }
-            else{
-               var numArgsWithDecl = argsIn.nodecls.length + argsIn.decls.length - params.length;
-               for(var n = 0; n < params.length; n++){
-                  generateExpr(params[n]);
-                  if(n+1 !== params.length){
-                     emit('(Push)');
-                  }
-                  numParams++;
+      if(argsIn.hasOwnProperty('nodecls')){
+         //If tush functions are given wrong number of arguments
+         if(params.length < argsIn.nodecls.length){
+            errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
+                        expr.name+"' ("+params.length+" for "+argsIn.nodecls.length+")>"
+                        );
+         }
+         else if(params.length > argsIn.nodecls.length + argsIn.decls.length){
+            errConstruct("#<ArgumentError: Wrong number of arguments calling '"+
+                        expr.name+"' ("+params.length+" for "+parseInt(argsIn.nodecls.length+argsIn.decls.length)+")>"
+                        );
+         }
+         else{
+            var numArgsWithDecl = argsIn.nodecls.length + argsIn.decls.length - params.length;
+            for(var n = 0; n < params.length; n++){
+               generateExpr(params[n]);
+               if(n+1 !== params.length){
+                  emit('(Push)');
                }
-               var i = argsIn.decls.length - numArgsWithDecl;
-               while(i !== argsIn.decls.length){
-                  if(params.length > 0){
-                     emit('(Push)');
-                  }
-                  emit('(MakeVal '+argsIn.decls[i].val+')');
-                  i++;
-                  numParams++;
+               numParams++;
+            }
+            var i = argsIn.decls.length - numArgsWithDecl;
+            while(i !== argsIn.decls.length){
+               if(params.length > 0){
+                  emit('(Push)');
                }
+               emit('(MakeVal '+argsIn.decls[i].val+')');
+               i++;
+               numParams++;
             }
          }
-         emit('(Call #"'+expr.name+'[f'+numParams+']" '+numParams+')');
-      }else{
-         for(var n = 0; n < expr.exprs.length; n++){
-            generateExpr(expr.exprs[n]);
-            if(n+1 !== expr.exprs.length)
-               emit('(Push)');
-         }
-         emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
       }
-   }else if(type === "CALLOP"){
+      return numParams;
+   },
+   normalFunc : function(expr){
       for(var n = 0; n < expr.exprs.length; n++){
          generateExpr(expr.exprs[n]);
          if(n+1 !== expr.exprs.length)
             emit('(Push)');
       }
-      emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
-   }
-   else if(type === "FETCH"){
+   },
+   store : function(expr){
+      generateExpr(expr.val);
+   },
+   callop : function(expr){
+      for(var n = 0; n < expr.exprs.length; n++){
+         generateExpr(expr.exprs[n]);
+         if(n+1 !== expr.exprs.length)
+            emit('(Push)');
+      }
+   },
+   fetch : function(expr){
       if(isNaN(varTable[expr.name])){
          errConstruct("Variable "+expr.name+" is undefined");
-         return;
+         return true;
       }
-      emit('(Fetch '+varTable[expr.name]+')');
-   }
-   else if(type === "LITERAL"){
-      emit('(MakeVal '+expr.val+')');
-   }
-   else if(type === "LIST"){
+      return false;
+   },
+   list : function(expr){
       if(expr.val === null){
          emit('(MakeVal null)');
       }else{
@@ -466,11 +459,11 @@ var generateExpr = function(expr){
          }
          emit('(List '+expr.val.length+')');
       }
-   }
-   else if(type === "()"){
+   },
+   parenth : function(expr){
       generateExpr(expr.val);
-   }
-   else if(type === "IF"){
+   },
+   ifst : function(expr){
       var conds = expr.conds;
       var bodies = expr.bodies;
       var startLabel = newLab();
@@ -490,12 +483,8 @@ var generateExpr = function(expr){
          emit('(MakeVal null)');
       }
       emit('_L'+endLabel+':');
-   }
-   else if(type === "RETURN"){
-      generateExpr(expr.val);
-      emit('(Return)');
-   }
-   else if(type === "WHILE"){
+   },
+   whilest : function(expr){
       var startLab = newLab();
       var nextLab = newLab();
 
@@ -507,32 +496,176 @@ var generateExpr = function(expr){
       }
       emit('(Go _L'+startLab+')');
       emit('_L'+nextLab+':');
-   }
-   else if(type === "BODY"){
+   },
+   body : function(expr){
       for(var n = 0; n < expr.exprs.length; n++){
          generateExpr(expr.exprs[n]);
       }
-   }
-   else if(type === "AND"){
+   },
+   and : function(expr){
       var falseLab = newLab();
       generateExpr(expr.exprs[0]);
       emit('(GoFalse _L'+falseLab+')');
       generateExpr(expr.exprs[1]);
       emit('_L'+falseLab+':');
-   }
-   else if(type === "OR"){
+   },
+   or : function(expr){
       var trueLab = newLab();
       generateExpr(expr.exprs[0]);
       emit('(GoTrue _L'+trueLab+')');
       generateExpr(expr.exprs[1]);
       emit('_L'+trueLab+':');
+   },
+   not : function(expr){
+      generateExpr(expr.val);
+   }
+};
+
+var generateExpr = function(expr){
+   var type = expr.type;
+
+   if(!type){
+      return;
+   }
+   else if(type === "CALLFUNC"){
+      //If we are dealing with functions from the tush language
+      if(functions[expr.name]){
+         var numParams = preExpr.tushFunc(expr);
+         emit('(Call #"'+expr.name+'[f'+numParams+']" '+numParams+')');
+      }else{
+         preExpr.normalFunc(expr);
+         emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
+      }
+   }
+   else if(type === "STORE"){
+      preExpr.store(expr);
+      emit('(Store '+varTable[expr.name]+')');
+   }
+   else if(type === "CALLOP"){
+      preExpr.callop(expr);
+      emit('(Call #"'+expr.name+'[f'+expr.exprs.length+']" '+expr.exprs.length+')');
+   }
+   else if(type === "FETCH"){
+      var hasError = preExpr.fetch(expr);
+      if(hasError) return;
+      emit('(Fetch '+varTable[expr.name]+')');
+   }
+   else if(type === "LITERAL"){
+      emit('(MakeVal '+expr.val+')');
+   }
+   else if(type === "LIST"){
+      preExpr.list(expr);
+   }
+   else if(type === "()"){
+      preExpr.parenth(expr);
+   }
+   else if(type === "IF"){
+      preExpr.ifst(expr);
+   }
+   else if(type === "RETURN"){
+      generateExprR(expr);
+   }
+   else if(type === "WHILE"){
+      preExpr.whilest(expr);
+   }
+   else if(type === "BODY"){
+      preExpr.body(expr);
+   }
+   else if(type === "AND"){
+      preExpr.and(expr);
+   }
+   else if(type === "OR"){
+      preExpr.or(expr);
    }
    else if(type === "NOT"){
-      generateExpr(expr.val);
+      preExpr.not(expr);
       emit('(Not)');
    }
    else{
-      //No, we don't need no else
+      errConstruct("Unexpected type of expression: "+type);
+   }
+};
+
+var generateExprR = function(expr){
+   var type = expr.type;
+   hasReturned = true;
+   if(!type){
+      hasReturned = false;
+      return;
+   }
+   else if(type === "RETURN"){
+      var returnExpr = expr.val;
+      var retType = returnExpr.type;
+
+      if(retType === "CALLFUNC"){
+         //If we are dealing with functions from the tush language
+         if(functions[returnExpr.name]){
+            var numParams = preExpr.tushFunc(returnExpr);
+            emit('(CallR #"'+returnExpr.name+'[f'+numParams+']" '+numParams+')');
+         }else{
+            preExpr.normalFunc(returnExpr);
+            emit('(CallR #"'+returnExpr.name+'[f'+returnExpr.exprs.length+']" '+
+               returnExpr.exprs.length+')');
+         }
+      }
+      else if(retType === "STORE"){
+         preExpr.store(returnExpr);
+         emit('(StoreR '+varTable[returnExpr.name]+')');
+      }
+      else if(retType === "CALLOP"){
+         preExpr.callop(returnExpr);
+         emit('(CallR #"'+returnExpr.name+'[f'+returnExpr.exprs.length+']" '+returnExpr.exprs.length+')');
+      }
+      else if(retType === "FETCH"){
+         var hasError = preExpr.fetch(returnExpr);
+         if(hasError) return;
+         emit('(FetchR '+varTable[returnExpr.name]+')');
+      }
+      else if(retType === "LITERAL"){
+         emit('(MakeValR '+returnExpr.val+')');
+      }
+      else if(retType === "LIST"){
+         preExpr.list(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "()"){
+         preExpr.parenth(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "IF"){
+         preExpr.ifst(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "RETURN"){
+         //no sense in making 'return return something' but we'll keep it here anyway
+         generateExprR(returnExpr.val);
+      }
+      else if(retType === "WHILE"){
+         preExpr.whilest(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "BODY"){
+         preExpr.body(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "AND"){
+         preExpr.and(returnExpr);
+         hasReturned = false
+      }
+      else if(retType === "OR"){
+         preExpr.or(returnExpr);
+         hasReturned = false;
+      }
+      else if(retType === "NOT"){
+         preExpr.not(returnExpr);
+         emit('(NotR)');
+      }
+      else{
+         errConstruct("Unexpected type of expression: "+retType);
+      }
+   }
+   else{
+      errConstruct("Can't call generateExprR function for type "+retType);
    }
 };
 
@@ -575,10 +708,20 @@ var generateFunction = function(name, func){
       generateDecl(decls[n].decl);
    }
    //Expressions in function
+   hasReturned = false;
    for(var n = 0; n < exprs.length; n++){
-      generateExpr(exprs[n]);
+      var expr = exprs[n];
+      //Implementation of tail recursion
+      if(expr.type === "RETURN"){
+         generateExprR(expr);
+      }else{
+         generateExpr(expr);
+      }
    }
-   emit('(Return)');
+   //if we haven't returned anything from current function
+   if(!hasReturned){
+      emit('(Return)');
+   }
    emit('];');
 };
 
