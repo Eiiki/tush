@@ -210,14 +210,29 @@ argwithdecl:
    ;
 
 exprs: 
-      exprs expr DECLEND
+      exprs someexpr
       %{
          $1.push($2);
          $$ = $1;
       %}
-   |  expr DECLEND
+   |  someexpr
       %{
          $$ = [$1];
+      %}
+   ;
+
+someexpr:
+      expr DECLEND
+      %{
+         $$ = $1;
+      %}
+   |  ifexpr
+      %{
+         $$ = $1;
+      %}
+   |  whileexpr
+      %{
+         $$ = $1;
       %}
    ;
 
@@ -288,8 +303,10 @@ expr:
    |  NULL                    { $$ = {type: "LITERAL",  val: $1}; }
    |  list                    { $$ = {type: "LIST",     val: $1 }; }
    |  '(' expr ')'            { $$ = {type: "()",       val: $2}; }
-   |  ifexpr
-   |  WHILE '(' expr ')' body END   { $$ = {type: "WHILE", cond: $3, body: $5}; }
+   ;
+
+whileexpr:
+      WHILE '(' expr ')' body END   { $$ = {type: "WHILE", cond: $3, body: $5}; }
    ;
 
 ifexpr: 

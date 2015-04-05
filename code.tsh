@@ -6,14 +6,14 @@ def fibo(n=10)
         return 1;
     else
         return fibo(n-1) + fibo(n-2);
-    end;
+    end
 end
 
 def max(a,b)
     var max = a;
     if(b > max)
         max = b;
-    end;
+    end
     return max;
 end
 
@@ -23,15 +23,23 @@ def min(a,b)
         return b;
     else
         return a;
-    end;
+    end
 end
 
 #example of tail recursion
 def lastEl(lis, n=null)
     if(lis == null)
         return n;
-    end;
+    end
     return lastEl(tail(lis), head(lis));
+end
+
+def lastEl2(lis, n=null)
+    while(not (lis == null))
+        n = head(lis);
+        lis = tail(lis);
+    end
+    return n;
 end
 
 #just and/or/not test
@@ -49,6 +57,7 @@ def main()
     println("x = [1,2,3,'meh' ]");
     println("head(x)       = " ++ head(x));
     println("lastEl(x)     = " ++ lastEl(x));
+    println("lastEl2(x)    = " ++ lastEl2(x));
     println("fibo()        = " ++ fibo());
     println("fibo(6)       = " ++ fibo(6));
     println("isFalse(true) = " ++ isFalse(true));
