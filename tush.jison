@@ -18,6 +18,7 @@
 "true"                     return 'TRUE';
 "false"                    return 'FALSE';
 "null"                     return 'NULL';
+"!="                       return '!=';
 "not"                      return 'NOT';
 "!"                        return 'NOT';
 "or"                       return 'OR';
@@ -72,10 +73,10 @@
 /* operator associations and precedence */
 
 %right RETURN
-%left NOT
 %left OR
 %left AND
-%left '<' '>' '<=' '>=' '=='
+%left '<' '>' '<=' '>=' '==' '!='
+%left NOT
 %left '++'
 %left '+' '-'
 %left '*' '/'
@@ -291,6 +292,7 @@ expr:
    |  expr '<=' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
    |  expr '>=' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
    |  expr '==' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
+   |  expr '!=' expr          { $$ = {type: "CALLOP",   name: $2, exprs: [$1, $3] }; }
    |  expr AND expr           { $$ = {type: "AND",      exprs: [$1, $3]}; }
    |  expr OR expr            { $$ = {type: "OR",       exprs: [$1, $3]}; }
    |  NOT expr                { $$ = {type: "NOT",      val: $2}; }

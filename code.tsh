@@ -35,7 +35,7 @@ def lastEl(lis, n=null)
 end
 
 def lastEl2(lis, n=null)
-    while(not (lis == null))
+    while(lis != null)
         n = head(lis);
         lis = tail(lis);
     end
