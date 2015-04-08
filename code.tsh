@@ -31,7 +31,8 @@ def lastEl(lis, n=null)
     if(lis == null)
         return n;
     end
-    return lastEl(tail(lis), head(lis));
+    lastEl(tail(lis), head(lis)); 
+    #or: return lastEl(tail(lis), head(lis));
 end
 
 def lastEl2(lis, n=null)
@@ -59,7 +60,7 @@ def main()
     println("lastEl(x)     = " ++ lastEl(x));
     println("lastEl2(x)    = " ++ lastEl2(x));
     println("fibo()        = " ++ fibo());
-    println("fibo(6)       = " ++ fibo(6));
+    println("fibo(15)      = " ++ fibo(15));
     println("isFalse(true) = " ++ isFalse(true));
     println("isFalse()     = " ++ isFalse());
     println("basicMath()   = " ++ basicMath());

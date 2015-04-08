@@ -540,7 +540,7 @@ var preExpr = {
    }
 };
 
-var generateExpr = function(expr){
+var generateExpr = function(expr, lastExpr){
    var type = expr.type;
 
    if(!type){
@@ -601,6 +601,7 @@ var generateExpr = function(expr){
       emit('(Not)');
    }
    else{
+      //This should not happen
       errConstruct("Unexpected type of expression: "+type);
    }
 };
@@ -680,11 +681,17 @@ var generateExprR = function(expr){
          emit('(NotR)');
       }
       else{
+         //This should not happen
          errConstruct("Unexpected type of expression: "+retType);
       }
    }
    else{
-      errConstruct("Can't call generateExprR function for type "+retType);
+      if(expr.type === "WHILE" || expr.type === "IF"){
+         //This should not happen
+         errConstruct("Can't call generateExprR function for type "+expr.type);
+         return;
+      }
+      generateExprR({type: "RETURN",   val: expr });
    }
 };
 
@@ -734,10 +741,21 @@ var generateFunction = function(name, func){
       if(expr.type === "RETURN"){
          generateExprR(expr);
       }else{
-         generateExpr(expr);
+         var lastExpr = n + 1 === exprs.length;
+         if(lastExpr && (expr.type === "WHILE" || expr.type === "IF")){
+            lastExpr = false;
+            hasReturned = false;
+         }
+         //If we are dealing with the last expression in a function and it's not if or while statement
+         //then we use the generateExprR function
+         if(lastExpr){
+            generateExprR(expr);
+         }else{
+            generateExpr(expr);
+         }
       }
    }
-   //if we haven't returned anything from current function
+   //if we haven't returned anything from current function. F.x. when function ends with an if/while statement
    if(!hasReturned){
       emit('(Return)');
    }
