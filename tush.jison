@@ -540,7 +540,7 @@ var preExpr = {
    }
 };
 
-var generateExpr = function(expr, lastExpr){
+var generateExpr = function(expr){
    var type = expr.type;
 
    if(!type){
