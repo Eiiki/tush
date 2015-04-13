@@ -35,14 +35,6 @@ def lastEl(lis, n=null)
     #or: return lastEl(tail(lis), head(lis));
 end
 
-def lastEl2(lis, n=null)
-    while(lis != null)
-        n = head(lis);
-        lis = tail(lis);
-    end
-    return n;
-end
-
 #just and/or/not test
 def isFalse(bool=false)
     return not((bool and not bool) or (bool and bool));
@@ -52,13 +44,29 @@ def basicMath()
     return (1 + 2 * 3 - 4 * 2) == (1 + (2*3) - (4*2));
 end
 
+def arrayTest()
+    var y = makeArray(5);
+    var i = 0;
+    println("Array test: ");
+    while(i < 5)
+        if(i % 2 == 0)
+            arraySet(y,i,i % 2 == 0);
+        else
+            arraySet(y,i,i);
+        end
+        println("\t y[" ++ i ++ "] = " ++ arrayGet(y,i));
+        i = i + 1;
+    end
+    println();
+end
+
 def main()
-    var x;
-    x = [1,2,3,"meh"];
-    println("x = [1,2,3,'meh' ]");
+    var x = [1,2,3,"meh"];
+    arrayTest();
+    println("a" and true);
+    println("x = [1,2,3,'meh']");
     println("head(x)       = " ++ head(x));
     println("lastEl(x)     = " ++ lastEl(x));
-    println("lastEl2(x)    = " ++ lastEl2(x));
     println("fibo()        = " ++ fibo());
     println("fibo(15)      = " ++ fibo(15));
     println("isFalse(true) = " ++ isFalse(true));
@@ -68,4 +76,5 @@ def main()
     println("max(1,2)      = " ++ max(1,2));
     println("max(1,min(2,3)) = " ++ max(1,min(2,3)));
     println("min(3,max(1,2)) = " ++ min(3,max(1,2)));
+    println("0.2 + 0.1       = " ++ 0.2 + 0.1);
 end

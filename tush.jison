@@ -50,7 +50,6 @@
 
 /* " */
 
-
 /lex
 %token FUNDECL
 %token NOT
@@ -75,12 +74,12 @@
 %right RETURN
 %left OR
 %left AND
-%left '<' '>' '<=' '>=' '==' '!='
 %left NOT
+%left '<' '>' '<=' '>=' '==' '!='
+%right '='
 %left '++'
 %left '+' '-'
 %left '*' '/'
-%right '='
 %right '%'
 %left UMINUS
 
@@ -364,9 +363,8 @@ body
 
 %%
 
+//global object containing all the functions
 var functions = {};
-//var vars = {}; //will use for micro-morpho
-//var exprs = {}; //will use for micro-morpho
 
 var programName = "test";
 var emit;
