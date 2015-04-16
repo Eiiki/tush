@@ -4,9 +4,8 @@ def fibo(n=10)
         return 0;
     elsif( n == 1)
         return 1;
-    else
-        return fibo(n-1) + fibo(n-2);
     end
+    return fibo(n-1) + fibo(n-2);
 end
 
 def max(a,b)
@@ -54,7 +53,7 @@ def arrayTest()
         else
             arraySet(y,i,i);
         end
-        println("\t y[" ++ i ++ "] = " ++ arrayGet(y,i));
+        println("\t y["++ i ++"] = " ++ arrayGet(y,i));
         i = i + 1;
     end
     println();
@@ -63,7 +62,6 @@ end
 def main()
     var x = [1,2,3,"meh"];
     arrayTest();
-    println("a" and true);
     println("x = [1,2,3,'meh']");
     println("head(x)       = " ++ head(x));
     println("lastEl(x)     = " ++ lastEl(x));

@@ -421,9 +421,8 @@ parse: function parse(input) {
 }};
 
 
+//global object containing all the functions
 var functions = {};
-//var vars = {}; //will use for micro-morpho
-//var exprs = {}; //will use for micro-morpho
 
 var programName = "test";
 var emit;
